@@ -2,7 +2,7 @@
 # Homework 6 - Responding to Change
 
 ## Authors
-1) Name, netid, [GitHub profile name]
+1) Akira Durham, zup9su, [akiradurham]
 2) Name, netid, [GitHub profile name]
 3) Name, netid, [GitHub profile name]
 4) Name, netid, [GitHub profile name]
@@ -15,7 +15,7 @@
 
 List the primary contributions of each author. It is recommended to update this with your contributions after each coding session.:
 
-### [Author 1 - replace this with their name]
+### [Akira Durham]
 
 * Author 1 contributions
 * as a bulleted list
