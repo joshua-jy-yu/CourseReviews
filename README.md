@@ -4,7 +4,7 @@
 ## Authors
 1) Akira Durham, zup9su, [akiradurham]
 2) Peter Dang, mwv6xv, [beyondtherice]
-3) Name, netid, [GitHub profile name]
+3) Joshua Yu, uqj7ur, [jjyu130]
 4) Name, netid, [GitHub profile name]
 
 ## To Run
