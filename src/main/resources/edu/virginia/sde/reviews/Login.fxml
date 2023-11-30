@@ -15,13 +15,13 @@
             <HBox alignment="CENTER" prefHeight="32.0" prefWidth="518.0">
                <children>
                   <Label prefHeight="25.0" prefWidth="72.0" text="Username : " />
-                  <TextField fx:id="username" prefHeight="25.0" prefWidth="150.0" promptText="Enter Username Here ..." />
+                  <TextField fx:id="usernameInput" prefHeight="25.0" prefWidth="150.0" promptText="Enter Username Here ..." />
                </children>
             </HBox>
             <HBox alignment="CENTER" prefHeight="36.0" prefWidth="518.0">
                <children>
                   <Label prefHeight="25.0" prefWidth="72.0" text="Password : " />
-                  <PasswordField fx:id="password" prefHeight="25.0" prefWidth="150.0" promptText="Enter Password Here ..." />
+                  <PasswordField fx:id="passwordInput" prefHeight="25.0" prefWidth="150.0" promptText="Enter Password Here ..." />
                </children>
             </HBox>
             <HBox alignment="CENTER" prefHeight="61.0" prefWidth="518.0">
