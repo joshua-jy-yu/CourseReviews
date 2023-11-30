@@ -15,20 +15,20 @@
             <HBox alignment="CENTER" prefHeight="32.0" prefWidth="518.0">
                <children>
                   <Label prefHeight="25.0" prefWidth="72.0" text="Username : " />
-                  <TextField prefHeight="25.0" prefWidth="150.0" promptText="Enter Username Here ..." />
+                  <TextField fx:id="username" prefHeight="25.0" prefWidth="150.0" promptText="Enter Username Here ..." />
                </children>
             </HBox>
             <HBox alignment="CENTER" prefHeight="36.0" prefWidth="518.0">
                <children>
                   <Label prefHeight="25.0" prefWidth="72.0" text="Password : " />
-                  <PasswordField prefHeight="25.0" prefWidth="150.0" promptText="Enter Password Here ..." />
+                  <PasswordField fx:id="password" prefHeight="25.0" prefWidth="150.0" promptText="Enter Password Here ..." />
                </children>
             </HBox>
             <HBox alignment="CENTER" prefHeight="61.0" prefWidth="518.0">
                <children>
                   <Button mnemonicParsing="false" onAction="#handleLogin" text="Login" />
                   <Separator orientation="VERTICAL" prefHeight="61.0" prefWidth="76.0" visible="false" />
-                  <Button mnemonicParsing="false" text="Create Account" />
+                  <Button mnemonicParsing="false" onAction="#handleCreateAccount" text="Create Account" />
                </children>
             </HBox>
             <Label fx:id="errorLabel" alignment="CENTER" prefHeight="17.0" prefWidth="231.0" textAlignment="CENTER" textFill="RED" visible="false" />
