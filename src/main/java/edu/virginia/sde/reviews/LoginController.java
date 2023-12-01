@@ -1,15 +1,10 @@
 package edu.virginia.sde.reviews;
-import jakarta.persistence.PersistenceException;
-import jakarta.persistence.TypedQuery;
+
+import jakarta.persistence.*;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import javafx.scene.control.*;
+import org.hibernate.*;
+
 
 public class LoginController{
     @FXML
@@ -21,42 +16,38 @@ public class LoginController{
     private static Session session;
     private int dataId;
 
-    private void openDatabase(){
-        try{
-            var StandardRegistry = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
-            var metaData = new MetadataSources(StandardRegistry).getMetadataBuilder().build();
-            SessionFactory sessionFactory = metaData.getSessionFactoryBuilder().build();
-            session = sessionFactory.openSession();
-            session.beginTransaction();
-        } catch (HibernateException e){
-            errorLabel.setText("Database cannot open");
-            errorLabel.setVisible(true);
-        }
-    }
-
     private boolean validateUsername(){
+        session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
         try{
             String query = "SELECT u FROM User u WHERE u.username = :username";
             TypedQuery<User> userQuery = session.createQuery(query, User.class);
             userQuery.setParameter("username", usernameInput);
             if(userQuery.getSingleResult().getUsername().equals(usernameInput.getText())) {
                 dataId = userQuery.getSingleResult().getId();
+                session.close();
                 return true;
             } else {
+                session.close();
                 return false;
             }
         } catch (HibernateException e){
+            session.close();
             return false;
         }
     }
 
     private boolean validatePassword(){
+        session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
         try{
             String query = "SELECT u FROM User u WHERE u.id = :id";
             TypedQuery<User> passQuery = session.createQuery(query, User.class);
             passQuery.setParameter("id", dataId);
+            session.close();
             return passQuery.getSingleResult().getPassword().equals(passwordInput.getText());
         } catch (HibernateException e){
+            session.close();
             return false;
         }
     }
@@ -64,13 +55,16 @@ public class LoginController{
     @FXML
     public void handleLogin(){
         errorLabel.setVisible(false);
-        openDatabase();
+
+        session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
+
         if(validateUsername()){
             if(validatePassword()){
-                // push user to course review page
                 errorLabel.setText("Successful login");
                 errorLabel.setVisible(true);
                 session.close();
+                // push user to course review page
             } else {
                 errorLabel.setText("Password is incorrect, Try Again");
                 errorLabel.setVisible(true);
@@ -79,12 +73,15 @@ public class LoginController{
             errorLabel.setText("Username is incorrect, Try again");
             errorLabel.setVisible(true);
         }
+        session.close();
     }
 
     @FXML
     public void handleCreateAccount() {
         errorLabel.setVisible(false);
-        openDatabase();
+
+        session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
 
         if(!validateUsername() && passwordInput.getText().length() >= 8){
             try {
@@ -107,5 +104,7 @@ public class LoginController{
                 errorLabel.setVisible(true);
             }
         }
+
+        session.close();
     }
 }
