@@ -3,6 +3,7 @@ package edu.virginia.sde.reviews;
 import jakarta.persistence.*;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.stage.Stage;
 import org.hibernate.*;
 
 
@@ -15,6 +16,11 @@ public class LoginController{
     private PasswordField passwordInput;
     private static Session session;
     private int dataId;
+    private Stage primaryStage;
+
+    public void setPrimaryStage(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+    }
 
     private boolean validateUsername(){
         session = HibernateUtil.getSessionFactory().openSession();
