@@ -12,5 +12,7 @@
         <property name="hibernate.hbm2ddl.auto" >create</property>
 
         <mapping class="edu.virginia.sde.reviews.User" />
+        <mapping class="edu.virginia.sde.reviews.Review" />
+        <mapping class="edu.virginia.sde.reviews.Course" />
     </session-factory>
 </hibernate-configuration>
