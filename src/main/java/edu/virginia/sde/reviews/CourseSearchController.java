@@ -1,5 +1,11 @@
 package edu.virginia.sde.reviews;
 
-public class CourseSearchController {
+import javafx.stage.Stage;
 
+public class CourseSearchController {
+    private Stage primaryStage;
+
+    public void setPrimaryStage(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+    }
 }

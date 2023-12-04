@@ -2,6 +2,8 @@ package edu.virginia.sde.reviews;
 
 import jakarta.persistence.*;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import org.hibernate.*;
@@ -75,7 +77,7 @@ public class LoginController{
             if(validatePassword()){
                 errorLabel.setText("Successful login");
                 errorLabel.setVisible(true);
-                // push user to course review page
+                loginSuccessful();
             } else {
                 errorLabel.setText("Password is incorrect, Try Again");
                 errorLabel.setVisible(true);
@@ -118,5 +120,19 @@ public class LoginController{
         }
         usernameInput.clear();
         passwordInput.clear();
+    }
+
+    private void loginSuccessful(){
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(CourseSearchController.class.getResource("CourseSearch.fxml"));
+            Scene courseScene = new Scene(fxmlLoader.load());
+            var controller = (CourseSearchController) fxmlLoader.getController();
+            controller.setPrimaryStage(primaryStage);
+            primaryStage.setTitle("Course Review - Main Page");
+            primaryStage.setScene(courseScene);
+            primaryStage.show();
+        } catch (Exception e){
+            // shouldnt be errors
+        }
     }
 }
