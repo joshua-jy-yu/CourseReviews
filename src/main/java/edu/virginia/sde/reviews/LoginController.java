@@ -9,9 +9,6 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
 public class LoginController{
     @FXML
@@ -29,42 +26,39 @@ public class LoginController{
         this.primaryStage = primaryStage;
     }
 
-    private void openDatabase(){
-        try{
-            var StandardRegistry = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
-            var metaData = new MetadataSources(StandardRegistry).getMetadataBuilder().build();
-            SessionFactory sessionFactory = metaData.getSessionFactoryBuilder().build();
-            session = sessionFactory.openSession();
-            session.beginTransaction();
-        } catch (HibernateException e){
-            errorLabel.setText("Database cannot open");
-            errorLabel.setVisible(true);
-        }
-    }
-
     private boolean validateUsername(){
+        session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
         try{
             String query = "SELECT u FROM User u WHERE u.username = :username";
             TypedQuery<User> userQuery = session.createQuery(query, User.class);
             userQuery.setParameter("username", usernameInput.getText());
             if(userQuery.getSingleResult().getUsername().equals(usernameInput.getText())) {
                 dataId = userQuery.getSingleResult().getId();
+                session.close();
                 return true;
             } else {
+                session.close();
                 return false;
             }
         } catch (HibernateException | NoResultException e){
+            session.close();
             return false;
         }
     }
 
     private boolean validatePassword(){
+        session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
         try{
             String query = "SELECT u FROM User u WHERE u.id = :id";
             TypedQuery<User> passQuery = session.createQuery(query, User.class);
             passQuery.setParameter("id", dataId);
-            return passQuery.getSingleResult().getPassword().equals(passwordInput.getText());
+            boolean validPassword = passQuery.getSingleResult().getPassword().equals(passwordInput.getText());
+            session.close();
+            return validPassword;
         } catch (HibernateException e){
+            session.close();
             return false;
         }
     }
@@ -72,13 +66,12 @@ public class LoginController{
     @FXML
     public void handleLogin(){
         errorLabel.setVisible(false);
-        openDatabase();
+
         if(validateUsername()){
             if(validatePassword()){
-                // push user to course review page
                 errorLabel.setText("Successful login");
                 errorLabel.setVisible(true);
-                session.close();
+                // push user to course review page
             } else {
                 errorLabel.setText("Password is incorrect, Try Again");
                 errorLabel.setVisible(true);
@@ -92,18 +85,21 @@ public class LoginController{
     @FXML
     public void handleCreateAccount() {
         errorLabel.setVisible(false);
-        openDatabase();
 
         if(!validateUsername() && passwordInput.getText().length() >= 8){
             try {
                 User user = new User(usernameInput.getText(), passwordInput.getText());
+                session = HibernateUtil.getSessionFactory().openSession();
+                session.beginTransaction();
                 session.persist(user);
                 session.getTransaction().commit();
                 errorLabel.setText("Account creation successful");
                 errorLabel.setVisible(true);
+                session.close();
             } catch (PersistenceException e) {
                 errorLabel.setText("Cannot update");
                 errorLabel.setVisible(true);
+                session.close();
             }
         } else {
             if(validateUsername()){
@@ -115,6 +111,8 @@ public class LoginController{
                 errorLabel.setVisible(true);
             }
         }
+
+
     }
 
     @FXML
