@@ -9,6 +9,7 @@
         <naming-strategy-map />
         <deploymentDescriptor name="hibernate.cfg.xml" url="file://$MODULE_DIR$/../../src/main/java/edu/virginia/sde/reviews/hibernate.cfg.xml" />
         <deploymentDescriptor name="hibernate.cfg.xml" url="file://$MODULE_DIR$/../../src/main/resources/edu/virginia/sde/reviews/hibernate.cfg.xml" />
+        <deploymentDescriptor name="hibernate.cfg.xml" url="file://$MODULE_DIR$/../../src/main/resources/edu/virginia/sde/reviews/hibernate2.cfg.xml" />
       </configuration>
     </facet>
   </component>

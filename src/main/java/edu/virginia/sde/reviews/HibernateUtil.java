@@ -4,6 +4,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import java.io.File;
 
 // THIS WAS PULLED DIRECTLY FROM CLASS NOTES
 // https://github.com/sde-coursepack/HibernateExample/blob/master/src/main/java/edu/virginia/sde/hibernate/HibernateUtil.java
@@ -13,8 +14,13 @@ public class HibernateUtil {
     private static SessionFactory buildSessionFactory() {
         try {
             if (sessionFactory == null) {
+                File file = new File("my_db.sqlite3");
                 var standardRegistry = new StandardServiceRegistryBuilder()
-                        .configure("/hibernate.cfg.xml").build();
+                        .configure("edu/virginia/sde/reviews/hibernate.cfg.xml").build();
+                if (!file.exists()){
+                    standardRegistry = new StandardServiceRegistryBuilder()
+                            .configure("edu/virginia/sde/reviews/hibernate2.cfg.xml").build();
+                }
 
                 var metaData = new MetadataSources(standardRegistry)
                         .getMetadataBuilder()

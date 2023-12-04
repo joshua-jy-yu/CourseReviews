@@ -9,14 +9,6 @@
 
         <property name="connection.url">jdbc:sqlite:my_db.sqlite3</property>
 
-        <!--
-        For the next line, this address how to handle if an existing database already exists at the connection URL
-        In general in this class, I recommend using update.
-
-        In practice, this line should never be used in production (that is, the working hosted version of the applicaton),
-        since it has potential to delete existing data. Only in a development environment that is not connected to the "real"
-        database (where current production data is actually stored).
-        -->
         <property name="hibernate.hbm2ddl.auto" >update</property>
 
         <mapping class="edu.virginia.sde.reviews.User" />

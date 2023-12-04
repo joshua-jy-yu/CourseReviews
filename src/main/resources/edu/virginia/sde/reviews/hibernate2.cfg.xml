@@ -1,0 +1,16 @@
+<hibernate-configuration>
+    <session-factory>
+        <property name="show_sql">false</property>
+        <property name="format_sql">false</property>
+
+        <property name="dialect">org.hibernate.community.dialect.SQLiteDialect</property>
+
+        <property name="connection.driver_class">org.sqlite.JDBC</property>
+
+        <property name="connection.url">jdbc:sqlite:my_db.sqlite3</property>
+
+        <property name="hibernate.hbm2ddl.auto" >create</property>
+
+        <mapping class="edu.virginia.sde.reviews.User" />
+    </session-factory>
+</hibernate-configuration>

@@ -19,81 +19,87 @@ public class LoginController{
     private boolean validateUsername(){
         session = HibernateUtil.getSessionFactory().openSession();
         session.beginTransaction();
-        try{
+        try {
             String query = "SELECT u FROM User u WHERE u.username = :username";
             TypedQuery<User> userQuery = session.createQuery(query, User.class);
-            userQuery.setParameter("username", usernameInput);
-            if(userQuery.getSingleResult().getUsername().equals(usernameInput.getText())) {
+            userQuery.setParameter("username", usernameInput.getText());
+            String user = userQuery.getSingleResult().getUsername();
+            String in = usernameInput.getText();
+
+            if (user.equals(in)) {
                 dataId = userQuery.getSingleResult().getId();
-                session.close();
                 return true;
-            } else {
-                session.close();
-                return false;
             }
-        } catch (HibernateException e){
-            session.close();
             return false;
+        } catch (NoResultException e) {
+            return false;
+        } finally {
+            session.close();
         }
     }
+
 
     private boolean validatePassword(){
         session = HibernateUtil.getSessionFactory().openSession();
         session.beginTransaction();
-        try{
+        try {
             String query = "SELECT u FROM User u WHERE u.id = :id";
             TypedQuery<User> passQuery = session.createQuery(query, User.class);
             passQuery.setParameter("id", dataId);
-            session.close();
             return passQuery.getSingleResult().getPassword().equals(passwordInput.getText());
-        } catch (HibernateException e){
-            session.close();
+        } catch (HibernateException e) {
             return false;
+        } finally {
+            session.close();
         }
     }
 
     @FXML
-    public void handleLogin(){
+    private void close(){
+        if (session != null && session.isOpen()){
+            session.close();
+        }
+        javafx.application.Platform.exit();
+    }
+
+    @FXML
+    private void handleLogin(){
         errorLabel.setVisible(false);
-
-        session = HibernateUtil.getSessionFactory().openSession();
-        session.beginTransaction();
-
         if(validateUsername()){
             if(validatePassword()){
                 errorLabel.setText("Successful login");
                 errorLabel.setVisible(true);
-                session.close();
                 // push user to course review page
             } else {
                 errorLabel.setText("Password is incorrect, Try Again");
                 errorLabel.setVisible(true);
             }
         } else {
-            errorLabel.setText("Username is incorrect, Try again");
+            errorLabel.setText("Username is incorrect or not in database, Try again");
             errorLabel.setVisible(true);
         }
-        session.close();
+        usernameInput.clear();
+        passwordInput.clear();
     }
 
     @FXML
-    public void handleCreateAccount() {
+    private void handleCreateAccount() {
         errorLabel.setVisible(false);
-
-        session = HibernateUtil.getSessionFactory().openSession();
-        session.beginTransaction();
-
         if(!validateUsername() && passwordInput.getText().length() >= 8){
+            User user = new User(usernameInput.getText(), passwordInput.getText());
             try {
-                User user = new User(usernameInput.getText(), passwordInput.getText());
+                session = HibernateUtil.getSessionFactory().openSession();
+                session.beginTransaction();
                 session.persist(user);
                 session.getTransaction().commit();
-                errorLabel.setText("Account creation successful");
-                errorLabel.setVisible(true);
             } catch (PersistenceException e) {
-                errorLabel.setText("Cannot update");
+                errorLabel.setText("Cannot update database");
                 errorLabel.setVisible(true);
+            } finally {
+                session.close();
             }
+            errorLabel.setText("Account creation successful");
+            errorLabel.setVisible(true);
         } else {
             if(validateUsername()){
                 errorLabel.setText("Username already exists, try again");
@@ -104,7 +110,7 @@ public class LoginController{
                 errorLabel.setVisible(true);
             }
         }
-
-        session.close();
+        usernameInput.clear();
+        passwordInput.clear();
     }
 }

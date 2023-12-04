@@ -8,7 +8,7 @@
    <children>
       <VBox alignment="CENTER" layoutX="1091.0" layoutY="703.0" prefHeight="77.0" prefWidth="189.0">
          <children>
-            <Button alignment="CENTER" mnemonicParsing="false" prefHeight="24.0" prefWidth="101.0" text="Close and Exit" textAlignment="CENTER" />
+            <Button alignment="CENTER" mnemonicParsing="false" onAction="#close" prefHeight="24.0" prefWidth="101.0" text="Close and Exit" textAlignment="CENTER" />
          </children></VBox>
       <VBox alignment="CENTER" layoutX="381.0" layoutY="244.0" prefHeight="292.0" prefWidth="518.0">
          <children>
@@ -31,7 +31,7 @@
                   <Button mnemonicParsing="false" onAction="#handleCreateAccount" text="Create Account" />
                </children>
             </HBox>
-            <Label fx:id="errorLabel" alignment="CENTER" prefHeight="17.0" prefWidth="231.0" textAlignment="CENTER" textFill="RED" visible="false" />
+            <Label fx:id="errorLabel" alignment="CENTER" prefHeight="17.0" prefWidth="463.0" textAlignment="CENTER" textFill="RED" visible="false" />
          </children>
       </VBox>
       <Label alignment="CENTER" layoutX="174.0" layoutY="121.0" prefHeight="77.0" prefWidth="933.0" text="Welcome to the Course Review Application">
