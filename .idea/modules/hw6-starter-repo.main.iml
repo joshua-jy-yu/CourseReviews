@@ -4,7 +4,8 @@
     <facet type="hibernate" name="Hibernate">
       <configuration>
         <datasource-map>
-          <unit-entry name="edu:virginia:sde:reviews:hibernate.cfg.xml" />
+          <unit-entry name="edu:virginia:sde:reviews:hibernate.cfg.xml" value="be1829b2-4ecd-494a-9ec4-8db23a93cfef" />
+          <unit-entry name="edu:virginia:sde:reviews:hibernate2.cfg.xml" value="7d0b1576-86fc-4410-88db-e31a82d7872f" />
         </datasource-map>
         <naming-strategy-map />
         <deploymentDescriptor name="hibernate.cfg.xml" url="file://$MODULE_DIR$/../../src/main/java/edu/virginia/sde/reviews/hibernate.cfg.xml" />

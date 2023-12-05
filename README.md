@@ -5,7 +5,7 @@
 1) Akira Durham, zup9su, [akiradurham]
 2) Peter Dang, mwv6xv, [beyondtherice]
 3) Joshua Yu, uqj7ur, [jjyu130]
-4) Name, netid, [GitHub profile name]
+4) Andrew Csontos, kmg9jh, [drewcsontos]
 
 ## To Run
 
@@ -33,7 +33,7 @@ List the primary contributions of each author. It is recommended to update this 
 * as a bulleted list
 * each line starts with an asterisk and a space
 
-### [Author 4 - replace this with their name]
+### [Andrew Csontos]
 
 * Author 4 contributions
 * as a bulleted list
