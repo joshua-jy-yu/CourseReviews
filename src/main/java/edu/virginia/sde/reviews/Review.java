@@ -17,8 +17,13 @@ public class Review {
     @Column(name = "Comment", nullable = false)
     private String comment;
 
-    @Column(name = "UserId", nullable = false)
-    private String userid;
+    @ManyToOne
+    @Column(name = "User", nullable = false)
+    private User user;
+
+    @ManyToOne
+    @Column(name = "Course", nullable = false)
+    private Course course;
 
     @Column(name = "Time", nullable = false)
     private String time;
@@ -27,17 +32,19 @@ public class Review {
 
     }
 
-    public Review(Integer rating, String userid) {
+    public Review(Integer rating, User user, Course course) {
         this.rating = rating;
         this.comment = "";
-        this.userid = userid;
+        this.user = user;
+        this.course = course;
         this.time = setTime();
     }
 
-    public Review(Integer rating, String comment, String userid) {
+    public Review(Integer rating, String comment, User user, Course course) {
         this.rating = rating;
         this.comment = comment;
-        this.userid = userid;
+        this.user = user;
+        this.course = course;
         this.time = setTime();
     }
 
@@ -65,12 +72,20 @@ public class Review {
         this.comment = comment;
     }
 
-    public String getUserid() {
-        return userid;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserid(String userid) {
-        this.userid = userid;
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Course getCourse() {
+        return course;
+    }
+
+    public void setCourse(Course course) {
+        this.course = course;
     }
 
     public String getTime() {
@@ -84,6 +99,6 @@ public class Review {
 
     @Override
     public String toString(){
-        return "Review: " + getRating() + " by " + getUserid() + " at " + getTime() + " with comment: " + getComment();
+        return "Review: " + getRating() + " by " + getUser().getUsername() + "for " + getCourse().toString() + " at " + getTime() + " with comment: " + getComment();
     }
 }

@@ -30,9 +30,9 @@ public class LoginController{
         try {
             String query = "SELECT u FROM User u WHERE u.username = :username";
             TypedQuery<User> userQuery = session.createQuery(query, User.class);
-            userQuery.setParameter("username", usernameInput.getText());
+            userQuery.setParameter("username", usernameInput.getText().strip());
             String user = userQuery.getSingleResult().getUsername();
-            String in = usernameInput.getText();
+            String in = usernameInput.getText().strip();
 
             if (user.equals(in)) {
                 dataId = userQuery.getSingleResult().getId();
@@ -54,7 +54,7 @@ public class LoginController{
             String query = "SELECT u FROM User u WHERE u.id = :id";
             TypedQuery<User> passQuery = session.createQuery(query, User.class);
             passQuery.setParameter("id", dataId);
-            return passQuery.getSingleResult().getPassword().equals(passwordInput.getText());
+            return passQuery.getSingleResult().getPassword().equals(passwordInput.getText().strip());
         } catch (HibernateException e) {
             return false;
         } finally {
@@ -77,6 +77,7 @@ public class LoginController{
             if(validatePassword()){
                 errorLabel.setText("Successful login");
                 errorLabel.setVisible(true);
+
                 loginSuccessful();
             } else {
                 errorLabel.setText("Password is incorrect, Try Again");
@@ -93,8 +94,8 @@ public class LoginController{
     @FXML
     private void handleCreateAccount() {
         errorLabel.setVisible(false);
-        if(!validateUsername() && passwordInput.getText().length() >= 8){
-            User user = new User(usernameInput.getText(), passwordInput.getText());
+        if(!validateUsername() && passwordInput.getText().strip().length() >= 8){
+            User user = new User(usernameInput.getText().strip(), passwordInput.getText().strip());
             try {
                 session = HibernateUtil.getSessionFactory().openSession();
                 session.beginTransaction();
@@ -128,11 +129,14 @@ public class LoginController{
             Scene courseScene = new Scene(fxmlLoader.load());
             var controller = (CourseSearchController) fxmlLoader.getController();
             controller.setPrimaryStage(primaryStage);
+            LoggedUser user = LoggedUser.getInstance();
+            user.setUsername(usernameInput.getText().strip());
             primaryStage.setTitle("Course Review - Main Page");
             primaryStage.setScene(courseScene);
             primaryStage.show();
         } catch (Exception e){
-            // shouldnt be errors
+            errorLabel.setText("Try again, IO error");
+            errorLabel.setVisible(true);
         }
     }
 }

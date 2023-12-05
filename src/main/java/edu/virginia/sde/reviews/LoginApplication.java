@@ -16,7 +16,7 @@ public class LoginApplication extends Application {
         Scene scene = new Scene(fxmlLoader.load());
         var controller = (LoginController) fxmlLoader.getController();
         controller.setPrimaryStage(primaryStage);
-        primaryStage.setTitle("Course Review");
+        primaryStage.setTitle("Course Review - Log-in");
         primaryStage.setScene(scene);
         primaryStage.show();
     }

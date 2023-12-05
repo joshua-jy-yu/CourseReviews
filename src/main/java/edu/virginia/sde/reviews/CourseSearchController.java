@@ -2,9 +2,12 @@ package edu.virginia.sde.reviews;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import org.hibernate.Session;
 
 import java.util.Objects;
 
@@ -18,13 +21,20 @@ public class CourseSearchController {
     @FXML
     public Label errorLabel;
     private Stage primaryStage;
+    private static Session session;
+    private LoggedUser loggedUser;
 
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
     }
 
     private void updateTable(){
-
+        // update list on button press
+        session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
+        session.persist(user);
+        session.getTransaction().commit();
+        session.close();
     }
 
     @FXML
@@ -35,8 +45,14 @@ public class CourseSearchController {
     @FXML
     private void addCourse(ActionEvent actionEvent) {
         errorLabel.setVisible(false);
-        if (validateSubject(courseSubject.getText()) && validateNumber(courseNumber.getText()) && validateTitle(courseTitle.getText())){
-
+        if (validateSubject(courseSubject.getText().strip()) && validateNumber(courseNumber.getText().strip()) && validateTitle(courseTitle.getText().strip())){
+            Course course = new Course(courseSubject.getText().strip(), Integer.parseInt(courseNumber.getText().strip()), courseTitle.getText().strip());
+            session = HibernateUtil.getSessionFactory().openSession();
+            session.beginTransaction();
+            session.persist(course);
+            session.getTransaction().commit();
+            session.close();
+            updateTable();
         }
     }
 
@@ -86,9 +102,35 @@ public class CourseSearchController {
 
     @FXML
     private void logout(ActionEvent actionEvent) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(CourseSearchController.class.getResource("Login.fxml"));
+            Scene courseScene = new Scene(fxmlLoader.load());
+            var controller = (LoginController) fxmlLoader.getController();
+            controller.setPrimaryStage(primaryStage);
+            LoggedUser user = LoggedUser.getInstance();
+            user.setUsername("");
+            primaryStage.setTitle("Course Review - Log-in");
+            primaryStage.setScene(courseScene);
+            primaryStage.show();
+        } catch (Exception e){
+            errorLabel.setText("Try again, IO error");
+            errorLabel.setVisible(true);
+        }
     }
 
     @FXML
     private void gotoReviews(ActionEvent actionEvent) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(CourseSearchController.class.getResource("MyReview.fxml"));
+            Scene courseScene = new Scene(fxmlLoader.load());
+            var controller = (MyReviewController) fxmlLoader.getController();
+            controller.setPrimaryStage(primaryStage);
+            primaryStage.setTitle("Course Review - My Reviews");
+            primaryStage.setScene(courseScene);
+            primaryStage.show();
+        } catch (Exception e){
+            errorLabel.setText("Try again, IO error");
+            errorLabel.setVisible(true);
+        }
     }
 }
