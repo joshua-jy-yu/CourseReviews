@@ -15,7 +15,7 @@
       <TextField fx:id="courseSubject" layoutX="123.0" layoutY="22.0" prefHeight="25.0" prefWidth="60.0" />
       <TextField fx:id="courseNumber" layoutX="315.0" layoutY="22.0" prefHeight="25.0" prefWidth="60.0" />
       <TextField fx:id="courseTitle" layoutX="493.0" layoutY="22.0" prefHeight="25.0" prefWidth="421.0" />
-      <Button layoutX="942.0" layoutY="22.0" mnemonicParsing="false" onAction="#search" text="Search" />
+      <Button layoutX="942.0" layoutY="22.0" mnemonicParsing="false" onAction="#search" text="Search / Reset Search" />
       <Button layoutX="1163.0" layoutY="14.0" mnemonicParsing="false" onAction="#addCourse" text="Add This Course" />
       <Label layoutX="34.0" layoutY="26.0" text="Course Subject : " />
       <Label layoutX="222.0" layoutY="26.0" text="Course Number : " />

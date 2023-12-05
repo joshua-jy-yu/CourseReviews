@@ -8,8 +8,8 @@ import java.sql.Timestamp;
 public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "Id")
-    private int id;
+    @Column(name = "courseId")
+    private int courseid;
 
     @Column(name = "Rating", nullable = false)
     private Integer rating;
@@ -18,11 +18,11 @@ public class Review {
     private String comment;
 
     @ManyToOne
-    @Column(name = "User", nullable = false)
+    @JoinColumn(name = "User_ID")
     private User user;
 
     @ManyToOne
-    @Column(name = "Course", nullable = false)
+    @JoinColumn(name = "Course_ID")
     private Course course;
 
     @Column(name = "Time", nullable = false)
@@ -49,11 +49,11 @@ public class Review {
     }
 
     public int getId() {
-        return id;
+        return courseid;
     }
 
     public void setId(int id) {
-        this.id = id;
+        this.courseid = id;
     }
 
     public Integer getRating() {

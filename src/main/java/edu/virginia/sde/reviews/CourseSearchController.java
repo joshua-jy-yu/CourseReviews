@@ -56,26 +56,27 @@ public class CourseSearchController {
         Root<Course> root = criteriaQuery.from(Course.class);
         List<Predicate> predicates = new ArrayList<>();
 
-        boolean subject = !courseSubject.getText().isBlank();
-        boolean number = !courseNumber.getText().isBlank();
-        boolean title = !courseTitle.getText().isBlank();
+        boolean subject = !courseSubject.getText().isEmpty();
+        boolean number = !courseNumber.getText().isEmpty();
+        boolean title = !courseTitle.getText().isEmpty();
 
         if (!subject && !number && !title){
             session.close();
+            updateTable();
             return;
         }
 
         if (subject){
-            predicates.add(builder.equal(root.get("subject"), "%" + courseSubject.getText().strip() + "%"));
+            predicates.add(builder.equal(builder.lower(root.get("subject")), courseSubject.getText().strip().toLowerCase()));
         }
-        if (subject){
-            predicates.add(builder.equal(root.get("number"), "%" + Integer.parseInt(courseNumber.getText().strip()) + "%"));
+        if (number){
+            predicates.add(builder.equal(root.get("number"), Integer.parseInt(courseNumber.getText().strip())));
         }
-        if (subject){
+        if (title){
             predicates.add(builder.like(root.get("title"), "%" + courseTitle.getText().strip() + "%"));
         }
         if (!predicates.isEmpty()) {
-            criteriaQuery.where(builder.or(predicates.toArray(new Predicate[0])));
+            criteriaQuery.where(builder.and(predicates.toArray(new Predicate[0])));
         }
 
         TypedQuery<Course> query = session.createQuery(criteriaQuery);
@@ -127,7 +128,7 @@ public class CourseSearchController {
             }
             return true;
         } else {
-            errorLabel.setText("The number is too long, has to be 4 digits");
+            errorLabel.setText("The number is incorrect, has to be 4 digits exactly");
             errorLabel.setVisible(true);
             return false;
         }
