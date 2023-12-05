@@ -1,14 +1,24 @@
 package edu.virginia.sde.reviews;
 
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.hibernate.Session;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class CourseSearchController {
@@ -20,6 +30,9 @@ public class CourseSearchController {
     public TextField courseTitle;
     @FXML
     public Label errorLabel;
+    @FXML
+    public ListView list;
+
     private Stage primaryStage;
     private static Session session;
     private LoggedUser loggedUser;
@@ -39,14 +52,56 @@ public class CourseSearchController {
 
     @FXML
     private void search(ActionEvent actionEvent) {
+        boolean subject = false, number = false, title = false;
         errorLabel.setVisible(false);
+        session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
+
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Course> criteriaQuery = builder.createQuery(Course.class);
+        Root<Course> root = criteriaQuery.from(Course.class);
+        List<Predicate> predicates = new ArrayList<>();
+
+
+
+        if (!courseSubject.getText().isBlank()){
+            subject = true;
+        }
+        if (!courseNumber.getText().isBlank()){
+            number = true;
+        }
+        if (!courseTitle.getText().isBlank()){
+            title = true;
+        }
+        if (!subject && !number && !title){
+            session.close();
+            return;
+        }
+        if (subject){
+            predicates.add(builder.like(root.get("subject"), "%" + courseSubject.getText().strip() + "%"));
+        }
+        if (subject){
+            predicates.add(builder.like(root.get("number"), "%" + Integer.parseInt(courseNumber.getText().strip()) + "%"));
+        }
+        if (subject){
+            predicates.add(builder.like(root.get("title"), "%" + courseTitle.getText().strip() + "%"));
+        }
+        if (!predicates.isEmpty()) {
+            criteriaQuery.where(builder.or(predicates.toArray(new Predicate[0])));
+        }
+
+        TypedQuery<Course> query = session.createQuery(criteriaQuery);
+        ObservableList<Course> results = FXCollections.observableList(query.getResultList());
+        list.getItems().clear();
+        list.getItems().addAll(results);
+        session.close();
     }
 
     @FXML
     private void addCourse(ActionEvent actionEvent) {
         errorLabel.setVisible(false);
         if (validateSubject(courseSubject.getText().strip()) && validateNumber(courseNumber.getText().strip()) && validateTitle(courseTitle.getText().strip())){
-            Course course = new Course(courseSubject.getText().strip(), Integer.parseInt(courseNumber.getText().strip()), courseTitle.getText().strip());
+            Course course = new Course(courseSubject.getText().strip().toUpperCase(), Integer.parseInt(courseNumber.getText().strip()), courseTitle.getText().strip());
             session = HibernateUtil.getSessionFactory().openSession();
             session.beginTransaction();
             session.persist(course);
