@@ -8,6 +8,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import org.hibernate.Session;
+
+import java.awt.event.MouseEvent;
 import java.util.*;
 
 
@@ -170,6 +172,24 @@ public class CourseSearchController {
             var controller = (MyReviewController) fxmlLoader.getController();
             controller.setPrimaryStage(primaryStage);
             primaryStage.setTitle("Course Review - My Reviews");
+            primaryStage.setScene(courseScene);
+            primaryStage.show();
+        } catch (Exception e){
+            errorLabel.setText("Try again, IO error");
+            errorLabel.setVisible(true);
+        }
+    }
+
+    @FXML
+    private void goToCourseReview() {
+        Course course = list.getSelectionModel().getSelectedItem();
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(CourseSearchController.class.getResource("CourseReview.fxml"));
+            Scene courseScene = new Scene(fxmlLoader.load());
+            var controller = (CourseReviewController) fxmlLoader.getController();
+            controller.setPrimaryStage(primaryStage);
+            String title = course.getSubject() + " " + course.getNumber() + " - " +course.getTitle();
+            primaryStage.setTitle(title);
             primaryStage.setScene(courseScene);
             primaryStage.show();
         } catch (Exception e){

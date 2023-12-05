@@ -8,8 +8,8 @@ import java.sql.Timestamp;
 public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "courseId")
-    private int courseid;
+    @Column(name = "Review_ID")
+    private int reviewid;
 
     @Column(name = "Rating", nullable = false)
     private Integer rating;
@@ -26,7 +26,7 @@ public class Review {
     private Course course;
 
     @Column(name = "Time", nullable = false)
-    private String time;
+    private Timestamp time;
 
     public Review(){
 
@@ -37,7 +37,7 @@ public class Review {
         this.comment = "";
         this.user = user;
         this.course = course;
-        this.time = setTime();
+        this.setTime();
     }
 
     public Review(Integer rating, String comment, User user, Course course) {
@@ -45,15 +45,15 @@ public class Review {
         this.comment = comment;
         this.user = user;
         this.course = course;
-        this.time = setTime();
+        this.setTime();
     }
 
     public int getId() {
-        return courseid;
+        return reviewid;
     }
 
     public void setId(int id) {
-        this.courseid = id;
+        this.reviewid = id;
     }
 
     public Integer getRating() {
@@ -88,14 +88,15 @@ public class Review {
         this.course = course;
     }
 
-    public String getTime() {
+    public Timestamp getTime() {
         return time;
     }
 
-    public String setTime() {
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        return String.valueOf(timestamp);
-    }
+    public void setTime(Timestamp time) { this.time = time; }
+
+    public void setTime() { time = new Timestamp(System.currentTimeMillis());}
+
+
 
     @Override
     public String toString(){
