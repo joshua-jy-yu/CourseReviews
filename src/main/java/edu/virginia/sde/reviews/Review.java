@@ -99,6 +99,17 @@ public class Review {
 
     @Override
     public String toString(){
-        return "Review: " + getRating() + " by " + getUser().getUsername() + "for " + getCourse().toString() + " at " + getTime() + " with comment: " + getComment();
+        if(rating == -1){
+            return "No Reviews";
+        }
+        String s = "Review: ";
+        if(course!=null)
+            s+= getCourse().toString();
+        if(rating != -1){
+            s+= ", Rating: " + rating;
+        }
+        s+= " " + getComment();
+        return s;
+        //return "Review: " + getRating() + " by " + getUser().getUsername() + "for " + getCourse().toString() + " at " + getTime() + " with comment: " + getComment();
     }
 }

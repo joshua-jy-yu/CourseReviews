@@ -131,6 +131,7 @@ public class LoginController{
             controller.setPrimaryStage(primaryStage);
             LoggedUser user = LoggedUser.getInstance();
             user.setUsername(usernameInput.getText().strip());
+            user.setId(dataId);
             primaryStage.setTitle("Course Review - Main Page");
             primaryStage.setScene(courseScene);
             primaryStage.show();

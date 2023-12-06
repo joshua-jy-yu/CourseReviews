@@ -10,8 +10,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.ListView;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import org.hibernate.Session;
+
+import java.util.stream.Collectors;
 
 public class MyReviewController {
     private Stage primaryStage;
@@ -50,10 +53,19 @@ public class MyReviewController {
         TypedQuery<Review> query = session.createQuery(criteriaQuery);
         ObservableList<Review> results = FXCollections.observableList(query.getResultList());
         list.getItems().clear();
+        results = results.stream().filter((result)->result.getUser().getId() == (LoggedUser.getInstance().getId())).collect(Collectors.toCollection(FXCollections::observableArrayList));
+        if(results.isEmpty()){
+            results.add(new Review(-1,"No Reviews",new User(),new Course()));
+        }
         list.setItems(results);
+
+        //list.click
         //user = session.get(User.class,0);
         //course = session.get(Course.class,0);
         //session.close();
         session.close();
+    }
+    @FXML public void handleMouseClick(MouseEvent arg0) {
+        System.out.println("clicked on " + list.getSelectionModel().getSelectedItem());
     }
 }
