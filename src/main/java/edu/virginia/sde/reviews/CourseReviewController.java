@@ -2,7 +2,6 @@ package edu.virginia.sde.reviews;
 
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -91,6 +90,7 @@ public class CourseReviewController {
         selectedCourse = course;
         loadCourseName();
         updateTable();
+        updateYourReview();
     }
 
     private void loadCourseName(){
@@ -101,7 +101,6 @@ public class CourseReviewController {
 
     public void initializeUser(LoggedUser loggedUser){
         this.loggedUser = loggedUser;
-        updateYourReview();
     }
 
     @FXML
@@ -144,15 +143,16 @@ public class CourseReviewController {
         session = HibernateUtil.getSessionFactory().openSession();
         session.beginTransaction();
         try {
-            String hql = "SELECT r FROM Review r WHERE r.user = :user";
+            String hql = "SELECT r FROM Review r WHERE r.user = :user AND r.course = :course";
             TypedQuery<Review> reviewQuery = session.createQuery(hql, Review.class);
             reviewQuery.setParameter("user", user);
+            reviewQuery.setParameter("course",selectedCourse);
             Review review = reviewQuery.getSingleResult();
             deleteReviewButton.setVisible(true);
             return true;
         } catch(NoResultException e){
             return false;
-        } finally {
+        }  finally {
             session.close();
         }
     }
@@ -191,7 +191,7 @@ public class CourseReviewController {
             yourReviewTime.setText(String.valueOf(review.getTime()));
         } else {
             yourReviewRating.setText("");
-            yourReviewComment.setText("No comments");
+            yourReviewComment.setText("");
             yourReviewTime.setText("N/A");
         }
 
@@ -201,9 +201,10 @@ public class CourseReviewController {
         User user = getUser();
         session = HibernateUtil.getSessionFactory().openSession();
         session.beginTransaction();
-        String hql = "SELECT r FROM Review r WHERE r.user = :user";
+        String hql = "SELECT r FROM Review r WHERE r.user = :user AND r.course = :course";
         TypedQuery<Review> reviewQuery = session.createQuery(hql, Review.class);
         reviewQuery.setParameter("user", user);
+        reviewQuery.setParameter("course", selectedCourse);
         Review review = reviewQuery.getSingleResult();
         session.getTransaction().commit();
         session.close();
@@ -270,8 +271,9 @@ public class CourseReviewController {
     private void updateAverageRating(){
         session = HibernateUtil.getSessionFactory().openSession();
         session.beginTransaction();
-        String hql = "from Review"; //class name, not Table name!
+        String hql = "Select r From Review r where r.course = :course"; //class name, not Table name!
         Query<Review> reviewQuery = session.createQuery(hql, Review.class);
+        reviewQuery.setParameter("course", selectedCourse);
         List<Review> reviewList = reviewQuery.getResultList();
         if(reviewList.isEmpty()){
             averageRatingLabel.setText("N/A");

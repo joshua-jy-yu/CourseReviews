@@ -9,6 +9,10 @@ import java.sql.Timestamp;
 @Table(name = "Reviews")
 public class Review {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "Id")
+    private int id;
+
     @ManyToOne
     @JoinColumn(name = "User", referencedColumnName = "Id")
     private User user;
@@ -50,6 +54,9 @@ public class Review {
     public String toString(){
         return "Review: " + getRating() + " by " + getUser().getUsername() + "for " + getCourse().toString() + " at " + getTime() + " with comment: " + getComment();
     }
+
+    public int getId() { return id; }
+    public void setId(int id) {this.id = id;}
 
     public int getRating() {
         return rating;
