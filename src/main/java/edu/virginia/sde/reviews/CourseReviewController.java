@@ -1,210 +1,288 @@
 package edu.virginia.sde.reviews;
 
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.*;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 
+import java.io.IOException;
+import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.*;
 
 public class CourseReviewController {
-    @FXML
-    private Label courseMnemonicLabel;
-    @FXML
-    private Label courseNumberLabel;
 
     @FXML
-    private Label courseTitleLabel;
+    private Label courseSubject;
+    @FXML
+    private Label courseNumber;
+    @FXML
+    private Label courseName;
+    @FXML
+    private Label selectedRating;
+    @FXML
+    private Label editReviewErrorLabel;
 
     @FXML
     private Label averageRatingLabel;
 
     @FXML
-    private TableView<Review> reviewTable;
-
-    @FXML
-    private RadioButton rating1;
-
-    @FXML
-    private RadioButton rating2;
-
-    @FXML
-    private RadioButton rating3;
-
-    @FXML
-    private RadioButton rating4;
-
-    @FXML
-    private RadioButton rating5;
-
+    private TableView<Review> reviewTableView;
     @FXML
     private TableColumn<Review, Integer> ratingColumn;
-
     @FXML
     private TableColumn<Review, String> commentColumn;
+    @FXML
+    private TableColumn<Review, Timestamp> timeColumn;
 
-    @FXML
-    private TableColumn<Review, Timestamp> timestampColumn;
-    @FXML
-    private Button submitButton;
-    @FXML
-    private Button deleteButton;
     @FXML
     private TextArea commentTextArea;
     @FXML
-    private ComboBox<Integer> ratingComboBox;
+    private RadioButton rating1button, rating2button, rating3button, rating4button, rating5button;
+    private ToggleGroup buttonGroup;
     @FXML
-    private Label editReviewErrorLabel;
+    private Button deleteReviewButton;
     @FXML
-    private Label deleteErrorLabel;
+    private Label yourReviewRating;
     @FXML
-    public Label errorLabel;
-
-    private Stage primaryStage;
-
-    private static Session session;
+    private Label yourReviewComment;
+    @FXML
+    private Label yourReviewTime;
 
     private Course selectedCourse;
+    private LoggedUser loggedUser;
+    private static Session session;
+    private Stage primaryStage;
 
-    private User currentUser;
-
-    public ListView<Course> list;
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        initialize();
+    }
+
+    public void setCourse(Course course){
+        selectedCourse = course;
+    }
+
+    public void initialize() {
+        editReviewErrorLabel.setVisible(false);
+        buttonGroup = new ToggleGroup();
+        rating1button.setToggleGroup(buttonGroup);
+        rating2button.setToggleGroup(buttonGroup);
+        rating3button.setToggleGroup(buttonGroup);
+        rating4button.setToggleGroup(buttonGroup);
+        rating5button.setToggleGroup(buttonGroup);
+        deleteReviewButton.setVisible(false);
+        reviewTableView.setPlaceholder(new Label("No reviews yet"));
+        ratingColumn.setCellValueFactory(new PropertyValueFactory<>("rating"));
+        commentColumn.setCellValueFactory(new PropertyValueFactory<>("comment"));
+        timeColumn.setCellValueFactory(new PropertyValueFactory<>("time"));
+        timeColumn.setSortType(TableColumn.SortType.DESCENDING);
+    }
+
+    public void initializeCourse(Course course) {
+        selectedCourse = course;
+        loadCourseName();
         updateTable();
+    }
+
+    private void loadCourseName(){
+        courseSubject.setText(selectedCourse.getSubject());
+        courseNumber.setText(String.valueOf(selectedCourse.getNumber()));
+        courseName.setText(selectedCourse.getTitle());
+    }
+
+    public void initializeUser(LoggedUser loggedUser){
+        this.loggedUser = loggedUser;
+        updateYourReview();
+    }
+
+    @FXML
+    private void submitReview() {
+        editReviewErrorLabel.setVisible(false);
+        if (validateRating()){
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+            User user = getUser();
+            if(!reviewExists()) {
+                session = HibernateUtil.getSessionFactory().openSession();
+                session.beginTransaction();
+                Review review = new Review(getRating(), getComment(), user, selectedCourse, timestamp);
+                session.persist(review);
+                session.getTransaction().commit();
+                session.close();
+                updateTable();
+                updateYourReview();
+            } else {
+                Review existingReview = getReview();
+                existingReview.setTime(timestamp);
+                existingReview.setComment(getComment());
+                existingReview.setRating(getRating());
+                session = HibernateUtil.getSessionFactory().openSession();
+                session.beginTransaction();
+                session.merge(existingReview);
+                session.getTransaction().commit();
+                session.close();
+                updateTable();
+                updateYourReview();
+            }
+            editReviewErrorLabel.setVisible(false);
+        } else {
+            editReviewErrorLabel.setText("A rating must be selected");
+            editReviewErrorLabel.setVisible(true);
+        }
+    }
+
+    private boolean reviewExists(){
+        User user = getUser();
+        session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
+        try {
+            String hql = "SELECT r FROM Review r WHERE r.user = :user";
+            TypedQuery<Review> reviewQuery = session.createQuery(hql, Review.class);
+            reviewQuery.setParameter("user", user);
+            Review review = reviewQuery.getSingleResult();
+            deleteReviewButton.setVisible(true);
+            return true;
+        } catch(NoResultException e){
+            return false;
+        } finally {
+            session.close();
+        }
+    }
+
+    private User getUser() {
+        String username = loggedUser.getUsername();
+        session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
+        String hql = "SELECT u FROM User u WHERE u.username = :username";
+        TypedQuery<User> reviewQuery = session.createQuery(hql, User.class);
+        reviewQuery.setParameter("username", username);
+        User user = reviewQuery.getSingleResult();
+        session.getTransaction().commit();
+        session.close();
+        return user;
     }
 
     private void updateTable(){
         session = HibernateUtil.getSessionFactory().openSession();
         session.beginTransaction();
-        CriteriaBuilder builder = session.getCriteriaBuilder();
-        CriteriaQuery<Course> criteriaQuery = builder.createQuery(Course.class);
-        Root<Course> root = criteriaQuery.from(Course.class);
-        criteriaQuery.select(root);
-        TypedQuery<Course> query = session.createQuery(criteriaQuery);
-        ObservableList<Course> results = FXCollections.observableList(query.getResultList());
-        list.getItems().clear();
-        list.setItems(results);
+        String hql = "SELECT r FROM Review r WHERE r.course = :course";
+        TypedQuery<Review> reviewQuery = session.createQuery(hql, Review.class);
+        reviewQuery.setParameter("course", selectedCourse);
+        ObservableList<Review> results = FXCollections.observableList(reviewQuery.getResultList());
+        reviewTableView.setItems(results);
+        reviewTableView.getSortOrder().add(timeColumn);
         session.close();
+        updateAverageRating();
     }
 
-    public void initialize() {
-        loadCourseInformation();
-        loadReviews();
+    private void updateYourReview(){
+        if(reviewExists()) {
+            Review review = getReview();
+            yourReviewRating.setText(String.valueOf(review.getRating()));
+            yourReviewComment.setText(review.getComment());
+            yourReviewTime.setText(String.valueOf(review.getTime()));
+        } else {
+            yourReviewRating.setText("");
+            yourReviewComment.setText("No comments");
+            yourReviewTime.setText("N/A");
+        }
+
     }
 
-    private void loadCourseInformation() {
-        courseMnemonicLabel.setText(selectedCourse.getSubject());
-        courseNumberLabel.setText(String.valueOf(selectedCourse.getNumber()));
-        courseTitleLabel.setText(selectedCourse.getTitle());
-    }
-
-    private double calculateAverageRating(Course course){
-        return 0.0;
-    }
-
-    private void loadReviews() {
+    private Review getReview() {
+        User user = getUser();
         session = HibernateUtil.getSessionFactory().openSession();
         session.beginTransaction();
-
-        CriteriaBuilder builder = session.getCriteriaBuilder();
-        CriteriaQuery<Course> criteriaQuery = builder.createQuery(Course.class);
-        Root<Review> root = criteriaQuery.from(Review.class);
-
-
+        String hql = "SELECT r FROM Review r WHERE r.user = :user";
+        TypedQuery<Review> reviewQuery = session.createQuery(hql, Review.class);
+        reviewQuery.setParameter("user", user);
+        Review review = reviewQuery.getSingleResult();
+        session.getTransaction().commit();
         session.close();
-
+        return review;
     }
 
-    private void showReview(Review review){
-        if (review != null) {
-            ratingColumn.setText(Integer.toString(review.getRating()));
-            commentColumn.setText(review.getComment());
+    private boolean validateRating() {
+        var toggle = buttonGroup.getSelectedToggle();
+        if(toggle==null) {
+            editReviewErrorLabel.setText("A rating has not been selected");
+            editReviewErrorLabel.setVisible(true);
+            return false;
         }
+        return true;
     }
 
-    @FXML
-    private void submitReview() {
-        int rating = Integer.parseInt(ratingColumn.getText());
-        String comment = commentColumn.getText();
+    private int getRating() {
+        var toggle = (RadioButton) buttonGroup.getSelectedToggle();
+        return Integer.parseInt(toggle.getText());
+    }
 
-        if (validateRating(rating)) {
-            if (reviewExists()) {
-                Review existingReview = getExistingReview();
-                existingReview.setRating(rating);
-                existingReview.setComment(comment);
-                existingReview.setTime();
-            } else {
-                Review newReview = new Review(rating, comment, currentUser, selectedCourse);
-                session.getTransaction().begin();
-                session.persist(newReview);
-                session.getTransaction().commit();
-            }
-
-            editReviewErrorLabel.setText("");
-            updateTable();
-        } else {
-            editReviewErrorLabel.setText("Invalid rating. Please enter a rating between 1 and 5.");
+    private String getComment() {
+        if(commentTextArea.getText()==null) {
+            return "";
         }
-    }
-
-    private boolean reviewExists() {
-        TypedQuery<Long> query = session.createQuery(
-                "SELECT COUNT(r) FROM Review r WHERE r.course = :course AND r.user = :user", Long.class);
-        query.setParameter("course", selectedCourse);
-        query.setParameter("user", currentUser);
-        return query.getSingleResult() > 0;
-    }
-
-    private Review getExistingReview() {
-        TypedQuery<Review> query = session.createQuery(
-                "SELECT r FROM Review r WHERE r.course = :course AND r.user = :user", Review.class);
-        query.setParameter("course", selectedCourse);
-        query.setParameter("user", currentUser);
-        return query.getSingleResult();
-    }
-
-
-    private boolean validateRating(int rating) {
-        return rating >= 1 && rating <= 5;
+        return commentTextArea.getText();
     }
 
     @FXML
     private void deleteReview() {
-        Review selectedReview = reviewTable.getSelectionModel().getSelectedItem();
-        if (selectedReview != null) {
-            session = HibernateUtil.getSessionFactory().openSession();
-            session.getTransaction().begin();
-            session.remove(selectedReview);
-            session.getTransaction().commit();
-            deleteErrorLabel.setText("");
-            updateTable();
-        } else {
-            deleteErrorLabel.setText("Please select a review to delete.");
-        }
+        Review existingReview = getReview();
+        session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
+        session.remove(existingReview);
+        session.getTransaction().commit();
+        session.close();
+        updateTable();
+        updateYourReview();
+        deleteReviewButton.setVisible(false);
     }
 
     @FXML
-    private void goBack() {
+    public void updateSelectedRating(ActionEvent e){
+        RadioButton selectedButton = (RadioButton)e.getSource();
+        selectedRating.setText(selectedButton.getText());
+    }
+
+    @FXML
+    private void goBack() throws IOException {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(CourseSearchController.class.getResource("CourseSearch.fxml"));
             Scene courseScene = new Scene(fxmlLoader.load());
             var controller = (CourseSearchController) fxmlLoader.getController();
             controller.setPrimaryStage(primaryStage);
+            controller.initializeUser(loggedUser);
             primaryStage.setTitle("Course Review - Main Page");
             primaryStage.setScene(courseScene);
             primaryStage.show();
-        } catch (Exception e){
-            errorLabel.setText("Try again, IO error");
-            errorLabel.setVisible(true);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+    }
+
+    private void updateAverageRating(){
+        session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
+        String hql = "from Review"; //class name, not Table name!
+        Query<Review> reviewQuery = session.createQuery(hql, Review.class);
+        List<Review> reviewList = reviewQuery.getResultList();
+        if(reviewList.isEmpty()){
+            averageRatingLabel.setText("N/A");
+        } else {
+            double total = 0.0;
+            for(Review review: reviewList){
+                total += review.getRating();
+            }
+            double average = total/reviewList.size();
+            averageRatingLabel.setText(String.format("%.2f", average));
+        }
+        session.close();
     }
 }

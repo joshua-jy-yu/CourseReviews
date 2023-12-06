@@ -10,6 +10,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import java.io.IOException;
 import java.util.*;
 
 
@@ -24,6 +25,8 @@ public class CourseSearchController {
     public Label errorLabel;
     @FXML
     public ListView<Course> list;
+
+    private LoggedUser loggedUser;
     private Stage primaryStage;
     private static Session session;
 
@@ -223,6 +226,7 @@ public class CourseSearchController {
             Scene courseScene = new Scene(fxmlLoader.load());
             var controller = (MyReviewController) fxmlLoader.getController();
             controller.setPrimaryStage(primaryStage);
+            controller.initializeUser(loggedUser);
             primaryStage.setTitle("Course Review - My Reviews");
             primaryStage.setScene(courseScene);
             primaryStage.show();
@@ -230,5 +234,29 @@ public class CourseSearchController {
             errorLabel.setText("Try again, IO error");
             errorLabel.setVisible(true);
         }
+    }
+
+    @FXML
+    private void goToCourseReview() throws IOException {
+        Course course = list.getSelectionModel().getSelectedItem();
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(CourseSearchController.class.getResource("CourseReview.fxml"));
+            Scene courseScene = new Scene(fxmlLoader.load());
+            var controller = (CourseReviewController) fxmlLoader.getController();
+            controller.setPrimaryStage(primaryStage);
+            controller.initializeUser(loggedUser);
+            controller.initializeCourse(course);
+            primaryStage.setTitle("Course Review - "+ course.getSubject()+" "+course.getNumber()+" - "+course.getTitle());
+            primaryStage.setScene(courseScene);
+            primaryStage.show();
+        } catch (IOException e){
+            errorLabel.setText("Try again, IO error");
+            errorLabel.setVisible(true);
+            throw e;
+        }
+    }
+
+    public void initializeUser(LoggedUser user) {
+        this.loggedUser = user;
     }
 }

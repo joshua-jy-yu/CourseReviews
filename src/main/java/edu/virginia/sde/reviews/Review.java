@@ -1,66 +1,54 @@
 package edu.virginia.sde.reviews;
 
 import jakarta.persistence.*;
+
+import java.sql.Time;
 import java.sql.Timestamp;
 
 @Entity
 @Table(name = "Reviews")
 public class Review {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "courseId")
-    private int courseid;
+    @ManyToOne
+    @JoinColumn(name = "User", referencedColumnName = "Id")
+    private User user;
 
     @Column(name = "Rating", nullable = false)
-    private Integer rating;
+    private int rating;
 
     @Column(name = "Comment", nullable = false)
     private String comment;
 
     @ManyToOne
-    @JoinColumn(name = "User_ID")
-    private User user;
-
-    @ManyToOne
-    @JoinColumn(name = "Course_ID")
+    @JoinColumn(name = "Course", referencedColumnName = "Id")
     private Course course;
 
     @Column(name = "Time", nullable = false)
-    private String time;
+    private Timestamp time;
 
     public Review(){
 
     }
 
-    public Review(Integer rating, User user, Course course) {
-        this.rating = rating;
-        this.comment = "";
-        this.user = user;
-        this.course = course;
-        this.time = setTime();
-    }
-
-    public Review(Integer rating, String comment, User user, Course course) {
+    public Review(int rating, String comment, User user, Course course, Timestamp time) {
         this.rating = rating;
         this.comment = comment;
         this.user = user;
         this.course = course;
-        this.time = setTime();
+        this.time = time;
     }
 
-    public int getId() {
-        return courseid;
+
+    @Override
+    public String toString(){
+        return "Review: " + getRating() + " by " + getUser().getUsername() + "for " + getCourse().toString() + " at " + getTime() + " with comment: " + getComment();
     }
 
-    public void setId(int id) {
-        this.courseid = id;
-    }
-
-    public Integer getRating() {
+    public int getRating() {
         return rating;
     }
 
-    public void setRating(Integer rating) {
+    public void setRating(int rating) {
         this.rating = rating;
     }
 
@@ -88,27 +76,15 @@ public class Review {
         this.course = course;
     }
 
-    public String getTime() {
+    public Timestamp getTime() {
         return time;
     }
 
-    public String setTime() {
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        return String.valueOf(timestamp);
+    public void setTime(String time) {
+        this.time = Timestamp.valueOf(time);
     }
 
-    @Override
-    public String toString(){
-        if(rating == -1){
-            return "No Reviews";
-        }
-        String s = "Review: ";
-        if(course!=null)
-            s+= getCourse().toString();
-        if(rating != -1){
-            s+= ", Rating: " + rating + "/5";
-        }
-        s+= " " + getComment();
-        return s;
+    public void setTime(Timestamp time) {
+        this.time = time;
     }
 }
