@@ -10,11 +10,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.ListView;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import org.hibernate.Session;
-
-import java.util.stream.Collectors;
 
 import java.io.IOException;
 
@@ -41,6 +38,8 @@ public class MyReviewController {
             primaryStage.setScene(courseScene);
             primaryStage.show();
         } catch (Exception e){
+//            errorLabel.setText("Try again, IO error");
+//            errorLabel.setVisible(true);
         }
     }
 
@@ -60,7 +59,6 @@ public class MyReviewController {
         TypedQuery<Review> query = session.createQuery(criteriaQuery);
         ObservableList<Review> results = FXCollections.observableList(query.getResultList());
         list.getItems().clear();
-        results = results.stream().filter((result)->result.getUser().getId() == (LoggedUser.getInstance().getId())).collect(Collectors.toCollection(FXCollections::observableArrayList));
         list.setItems(results);
         //user = session.get(User.class,0);
         //course = session.get(Course.class,0);
