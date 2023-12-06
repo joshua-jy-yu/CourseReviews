@@ -9,7 +9,7 @@
 
 ## To Run
 
-[Add a brief description of which .java file to run, and what vm arguments are needed]
+Ran with --module-path "C:\Program Files\JavaFX\javafx-sdk-17.0.9\lib" --add-modules javafx.controls,javafx.fxml VM arguments on LoginApplication
 
 ## Contributions
 
@@ -17,27 +17,23 @@ List the primary contributions of each author. It is recommended to update this 
 
 ### [Akira Durham]
 
-* Author 1 contributions
-* as a bulleted list
-* each line starts with an asterisk and a space
+* Worked on Login Page and Course Search page
+* Debugging
 
 ### [Peter Dang]
 
-* Author 2 contributions
-* as a bulleted list
-* each line starts with an asterisk and a space
+* Worked on CourseReviewPage
+* Debugging
 
-### [Author 3 - replace this with their name]
+### [Joshua Yu]
 
-* Author 3 contributions
-* as a bulleted list
-* each line starts with an asterisk and a space
+* Worked on CourseReviewPage
+* Debugging
 
 ### [Andrew Csontos]
 
-* Author 4 contributions
-* as a bulleted list
-* each line starts with an asterisk and a space
+* Worked on MyReview Page
+* Debugging
 
 ## Issues
 
