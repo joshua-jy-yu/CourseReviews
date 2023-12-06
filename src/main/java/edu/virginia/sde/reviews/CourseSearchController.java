@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import java.util.*;
 
@@ -95,16 +96,43 @@ public class CourseSearchController {
 
     @FXML
     private void addCourse() {
+        session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
         errorLabel.setVisible(false);
         if (validateSubject(courseSubject.getText().strip()) && validateNumber(courseNumber.getText().strip()) && validateTitle(courseTitle.getText().strip())){
-            Course course = new Course(courseSubject.getText().strip().toUpperCase(), Integer.parseInt(courseNumber.getText().strip()), courseTitle.getText().strip());
-            session = HibernateUtil.getSessionFactory().openSession();
-            session.beginTransaction();
-            session.persist(course);
-            session.getTransaction().commit();
-            session.close();
-            updateTable();
+            try {
+                Course course = new Course(courseSubject.getText().strip().toUpperCase(), Integer.parseInt(courseNumber.getText().strip()), courseTitle.getText().strip());
+
+                CriteriaBuilder builder = session.getCriteriaBuilder();
+                CriteriaQuery<Course> criteriaQuery = builder.createQuery(Course.class);
+                Root<Course> root = criteriaQuery.from(Course.class);
+                List<Predicate> predicates = new ArrayList<>();
+                predicates.add(builder.like(builder.lower(root.get("subject")), courseSubject.getText().strip().toLowerCase()));
+                predicates.add(builder.equal(root.get("number"), Integer.parseInt(courseNumber.getText().strip())));
+                predicates.add(builder.like(root.get("title"),  courseTitle.getText().strip().toLowerCase()));
+                criteriaQuery.where(builder.and(predicates.toArray(new Predicate[0])));
+                TypedQuery<Course> query = session.createQuery(criteriaQuery);
+                boolean check = query.getResultList().isEmpty();
+                session.close();
+                if (check){
+                    session = HibernateUtil.getSessionFactory().openSession();
+                    session.beginTransaction();
+                    session.persist(course);
+                    session.getTransaction().commit();
+                    session.close();
+                } else {
+                    errorLabel.setText("Course Already Exists");
+                    errorLabel.setVisible(true);
+                }
+            } catch (HibernateException e) {
+                errorLabel.setText("IO Error, Retry");
+                errorLabel.setVisible(true);
+                updateTable();
+                session.close();
+            }
         }
+        updateTable();
+        session.close();
     }
 
     @FXML public void handleMouseClick(MouseEvent arg0) {
@@ -121,8 +149,8 @@ public class CourseSearchController {
             primaryStage.setScene(courseScene);
             primaryStage.show();
         } catch (Exception e){
-//            errorLabel.setText("Try again, IO error");
-//            errorLabel.setVisible(true);
+            errorLabel.setText("Try again, IO error");
+            errorLabel.setVisible(true);
         }
     }
 
