@@ -2,6 +2,8 @@ package edu.virginia.sde.reviews;
 
 import jakarta.persistence.*;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Entity
 @Table(name = "Reviews")
@@ -34,7 +36,7 @@ public class Review {
 
     public Review(Integer rating, User user, Course course) {
         this.rating = rating;
-        this.comment = "";
+        this.comment = "N/A";
         this.user = user;
         this.course = course;
         this.time = setTime();
@@ -94,11 +96,13 @@ public class Review {
 
     public String setTime() {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        return String.valueOf(timestamp);
+        LocalDateTime datetime = timestamp.toLocalDateTime();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return datetime.format(formatter);
     }
 
     @Override
     public String toString(){
-        return "Review: " + getRating() + " by " + getUser().getUsername() + "for " + getCourse().toString() + " at " + getTime() + " with comment: " + getComment();
+        return "Review: " + getRating() + "/5 by " + getUser().getUsername() + " for " + getCourse().toString() + " on " + getTime() + " with comment: " + getComment();
     }
 }

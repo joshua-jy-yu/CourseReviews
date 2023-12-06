@@ -67,6 +67,13 @@ public class CourseSearchController {
         }
 
         if (subject){
+            subject = validateSubject(courseSubject.getText().strip());
+        }
+        if (number){
+            number = validateNumber(courseNumber.getText().strip());
+        }
+
+        if (subject){
             predicates.add(builder.equal(builder.lower(root.get("subject")), courseSubject.getText().strip().toLowerCase()));
         }
         if (number){
