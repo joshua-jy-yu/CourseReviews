@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 import org.hibernate.Session;
 
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.util.*;
 
 
@@ -25,6 +26,7 @@ public class CourseSearchController {
     @FXML
     public ListView<Course> list;
 
+    private LoggedUser loggedUser;
     private Stage primaryStage;
     private static Session session;
 
@@ -181,20 +183,26 @@ public class CourseSearchController {
     }
 
     @FXML
-    private void goToCourseReview() {
+    private void goToCourseReview() throws IOException {
         Course course = list.getSelectionModel().getSelectedItem();
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(CourseSearchController.class.getResource("CourseReview.fxml"));
             Scene courseScene = new Scene(fxmlLoader.load());
             var controller = (CourseReviewController) fxmlLoader.getController();
             controller.setPrimaryStage(primaryStage);
-            String title = course.getSubject() + " " + course.getNumber() + " - " +course.getTitle();
-            primaryStage.setTitle(title);
+            controller.initializeUser(loggedUser);
+            controller.initializeCourse(course);
+            primaryStage.setTitle("Course Review - "+ course.getSubject()+" "+course.getNumber()+" - "+course.getTitle());
             primaryStage.setScene(courseScene);
             primaryStage.show();
-        } catch (Exception e){
+        } catch (IOException e){
             errorLabel.setText("Try again, IO error");
             errorLabel.setVisible(true);
+            throw e;
         }
+    }
+
+    public void initializeUser(LoggedUser user) {
+        this.loggedUser = user;
     }
 }
