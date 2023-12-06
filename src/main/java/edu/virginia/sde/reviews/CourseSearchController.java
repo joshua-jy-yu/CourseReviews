@@ -6,6 +6,7 @@ import javafx.collections.*;
 import javafx.fxml.*;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import org.hibernate.Session;
 import java.util.*;
@@ -22,7 +23,6 @@ public class CourseSearchController {
     public Label errorLabel;
     @FXML
     public ListView<Course> list;
-
     private Stage primaryStage;
     private static Session session;
 
@@ -104,6 +104,25 @@ public class CourseSearchController {
             session.getTransaction().commit();
             session.close();
             updateTable();
+        }
+    }
+
+    @FXML public void handleMouseClick(MouseEvent arg0) {
+        Course course = list.getSelectionModel().getSelectedItem();
+        if (course == null){
+            return; // give error
+        }
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(CourseReviewController.class.getResource("CourseReview.fxml"));
+            Scene courseScene = new Scene(fxmlLoader.load());
+            var controller = (CourseReviewController) fxmlLoader.getController();
+            controller.setPrimaryStage(primaryStage);
+            primaryStage.setTitle("Course Review - Update Page");
+            primaryStage.setScene(courseScene);
+            primaryStage.show();
+        } catch (Exception e){
+//            errorLabel.setText("Try again, IO error");
+//            errorLabel.setVisible(true);
         }
     }
 

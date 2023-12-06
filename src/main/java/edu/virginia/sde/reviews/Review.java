@@ -106,10 +106,9 @@ public class Review {
         if(course!=null)
             s+= getCourse().toString();
         if(rating != -1){
-            s+= ", Rating: " + rating;
+            s+= ", Rating: " + rating + "/5";
         }
         s+= " " + getComment();
         return s;
-        //return "Review: " + getRating() + " by " + getUser().getUsername() + "for " + getCourse().toString() + " at " + getTime() + " with comment: " + getComment();
     }
 }

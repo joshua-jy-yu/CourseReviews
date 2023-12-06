@@ -37,8 +37,6 @@ public class MyReviewController {
             primaryStage.setScene(courseScene);
             primaryStage.show();
         } catch (Exception e){
-//            errorLabel.setText("Try again, IO error");
-//            errorLabel.setVisible(true);
         }
     }
     private void updateTable(){
@@ -58,15 +56,13 @@ public class MyReviewController {
             results.add(new Review(-1,"No Reviews",new User(),new Course()));
         }
         list.setItems(results);
-
-        //list.click
-        //user = session.get(User.class,0);
-        //course = session.get(Course.class,0);
-        //session.close();
         session.close();
     }
     @FXML public void handleMouseClick(MouseEvent arg0) {
         Review review = list.getSelectionModel().getSelectedItem();
+        if(review == null){
+            return;
+        }
         if(review.getRating() != -1){
             try {
                 FXMLLoader fxmlLoader = new FXMLLoader(CourseReviewController.class.getResource("CourseReview.fxml"));
