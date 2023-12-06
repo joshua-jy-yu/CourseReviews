@@ -173,6 +173,7 @@ public class CourseSearchController {
             Scene courseScene = new Scene(fxmlLoader.load());
             var controller = (MyReviewController) fxmlLoader.getController();
             controller.setPrimaryStage(primaryStage);
+            controller.initializeUser(loggedUser);
             primaryStage.setTitle("Course Review - My Reviews");
             primaryStage.setScene(courseScene);
             primaryStage.show();
