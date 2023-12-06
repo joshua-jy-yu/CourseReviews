@@ -66,6 +66,20 @@ public class MyReviewController {
         session.close();
     }
     @FXML public void handleMouseClick(MouseEvent arg0) {
-        System.out.println("clicked on " + list.getSelectionModel().getSelectedItem());
+        Review review = list.getSelectionModel().getSelectedItem();
+        if(review.getRating() != -1){
+            try {
+                FXMLLoader fxmlLoader = new FXMLLoader(CourseReviewController.class.getResource("CourseReview.fxml"));
+                Scene courseScene = new Scene(fxmlLoader.load());
+                var controller = (CourseReviewController) fxmlLoader.getController();
+                controller.setPrimaryStage(primaryStage);
+                primaryStage.setTitle("Course Review - Update Page");
+                primaryStage.setScene(courseScene);
+                primaryStage.show();
+            } catch (Exception e){
+//            errorLabel.setText("Try again, IO error");
+//            errorLabel.setVisible(true);
+            }
+        }
     }
 }
