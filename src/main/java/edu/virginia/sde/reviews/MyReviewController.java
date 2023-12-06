@@ -61,9 +61,6 @@ public class MyReviewController {
         ObservableList<Review> results = FXCollections.observableList(query.getResultList());
         list.getItems().clear();
         results = results.stream().filter((result)->result.getUser().getId() == (LoggedUser.getInstance().getId())).collect(Collectors.toCollection(FXCollections::observableArrayList));
-        if(results.isEmpty()){
-            results.add(new Review(-1,"No Reviews",new User(),new Course()));
-        }
         list.setItems(results);
         //user = session.get(User.class,0);
         //course = session.get(Course.class,0);

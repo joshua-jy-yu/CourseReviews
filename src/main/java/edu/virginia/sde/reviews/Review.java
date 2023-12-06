@@ -38,6 +38,13 @@ public class Review {
         this.time = time;
     }
 
+    public Review(int rating, String comment, User user, Course course) {
+        this.rating = rating;
+        this.comment = comment;
+        this.user = user;
+        this.course = course;
+        this.time = time;
+    }
 
     @Override
     public String toString(){
