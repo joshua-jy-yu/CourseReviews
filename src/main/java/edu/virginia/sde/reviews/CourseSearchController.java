@@ -220,7 +220,7 @@ public class CourseSearchController {
     }
 
     @FXML
-    private void gotoReviews() {
+    private void gotoReviews() throws IOException {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(CourseSearchController.class.getResource("MyReview.fxml"));
             Scene courseScene = new Scene(fxmlLoader.load());
@@ -233,6 +233,7 @@ public class CourseSearchController {
         } catch (Exception e){
             errorLabel.setText("Try again, IO error");
             errorLabel.setVisible(true);
+            throw e;
         }
     }
 

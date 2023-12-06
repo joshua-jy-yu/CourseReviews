@@ -3,6 +3,7 @@ package edu.virginia.sde.reviews;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -12,6 +13,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 
 import java.io.IOException;
 
@@ -24,7 +26,6 @@ public class MyReviewController {
 
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        updateTable();
     }
     @FXML
     private void back() {
@@ -45,29 +46,28 @@ public class MyReviewController {
 
     public void initializeUser(LoggedUser loggedUser){
         this.loggedUser = loggedUser;
+        updateTable();
     }
 
     private void updateTable(){
-        //Course course;
-        //User user;
+        User user = getUser();
         session = HibernateUtil.getSessionFactory().openSession();
         session.beginTransaction();
         CriteriaBuilder builder = session.getCriteriaBuilder();
-        CriteriaQuery<Review> criteriaQuery = builder.createQuery(Review.class);
-        Root<Review> root = criteriaQuery.from(Review.class);
-        criteriaQuery.select(root);
-        TypedQuery<Review> query = session.createQuery(criteriaQuery);
+        CriteriaQuery<Review> criteria = builder.createQuery(Review.class);
+        Root<Review> root = criteria.from(Review.class);
+
+        Predicate userReviews = builder.equal(root.get("user"), user);
+        criteria.select(root).where(builder.and(userReviews));
+        TypedQuery<Review> query = session.createQuery(criteria);
         ObservableList<Review> results = FXCollections.observableList(query.getResultList());
         list.getItems().clear();
         list.setItems(results);
-        //user = session.get(User.class,0);
-        //course = session.get(Course.class,0);
-        //session.close();
         session.close();
     }
 
     @FXML
-    private void goToCourseReview() throws IOException {
+    private void goToCourseReview(){
         Course course = list.getSelectionModel().getSelectedItem().getCourse();
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(CourseSearchController.class.getResource("CourseReview.fxml"));
@@ -80,6 +80,20 @@ public class MyReviewController {
             primaryStage.setScene(courseScene);
             primaryStage.show();
         } catch (IOException e){
+
         }
+    }
+
+    private User getUser() {
+        String username = loggedUser.getUsername();
+        session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
+        String hql = "SELECT u FROM User u WHERE u.username = :username";
+        TypedQuery<User> reviewQuery = session.createQuery(hql, User.class);
+        reviewQuery.setParameter("username", username);
+        User user = reviewQuery.getSingleResult();
+        session.getTransaction().commit();
+        session.close();
+        return user;
     }
 }
