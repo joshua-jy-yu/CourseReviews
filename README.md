@@ -1,6 +1,8 @@
 # Course Review Java App
 A JavaFX application where users can login, search for courses, and upload reviews.
 
+![Review Page of CourseReviewApp](./images/Screenshot.png)
+
 ## Authors
 1) Akira Durham, zup9su, [akiradurham]
 2) Peter Dang, mwv6xv, [beyondtherice]
@@ -34,7 +36,3 @@ List the primary contributions of each author. It is recommended to update this 
 
 * Worked on MyReview Page
 * Debugging
-
-## Issues
-
-List any known issues (bugs, incorrect behavior, etc.) at the time of submission.
