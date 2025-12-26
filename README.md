@@ -1,4 +1,5 @@
-# Homework 6 - Responding to Change
+# Course Review Java App
+A JavaFX application where users can login, search for courses, and upload reviews.
 
 ## Authors
 1) Akira Durham, zup9su, [akiradurham]
