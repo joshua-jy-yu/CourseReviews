@@ -15,8 +15,6 @@ Ran with --module-path "C:\Program Files\JavaFX\javafx-sdk-17.0.9\lib" --add-mod
 
 ## Contributions
 
-List the primary contributions of each author. It is recommended to update this with your contributions after each coding session.:
-
 ### [Akira Durham]
 
 * Worked on Login Page and Course Search page
