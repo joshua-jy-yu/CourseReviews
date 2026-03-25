@@ -1,5 +1,6 @@
 # Course Review Java App
 A JavaFX application where users can login, search for courses, and upload reviews.
+This is a clone of the final project built for CS 3140 Software Development Essentials in Fall 2023.
 
 ![Review Page of CourseReviewApp](./images/Screenshot.png)
 
